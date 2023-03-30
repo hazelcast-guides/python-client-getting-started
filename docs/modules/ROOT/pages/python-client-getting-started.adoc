@@ -103,14 +103,14 @@ The output snippet is
 12345 -> example1@email.com
 ----
 
-Since Hazelcast clients work asynchronous, our output is not in order.
+Since Hazelcast clients work asynchronous, the output is not in order.
 
-Following line returns a map proxy object for the `some-map` named map.
+Following line returns a map proxy object for the map with name `some-map`.
 
 [source, python]
 some_map = client.get_map("some-map").blocking()
 
-If there is not a map named `some-map`, it will be automatically created. All the clients connected to the same cluster will have access to same map.
+If `some-map` doesn't exist, it will be automatically created. All the clients connected to the same cluster will have access to the same map.
 
 You may wonder why we have used `blocking()` method over the `get_map()`. This returns a version of this proxy with only blocking (sync) method calls, which is better for getting started. For async calls, please check our https://hazelcast.readthedocs.io/en/stable/client.html#hazelcast.client.HazelcastClient[API documentation].
 
@@ -124,11 +124,11 @@ some_map.set("12346", "example2@email.com")
 
 Then, we get the values with the `entry_set()` method.
 
-Finally, `client.shutdown()` shutdowns our client.
+Finally, `client.shutdown()` terminates our client and release its resources.
 
 == Add a Listener to the Map
 
-You can add entry listener using the `add_entry_listener()` method available on map proxy object. This will allow you to listen to certain events that happen in the map across the cluster.
+You can add an entry listener using the `add_entry_listener()` method of the map proxy object. This enables your code to listen to map events of that particular map.
 
 The first argument to `add_entry_listener()` method is `includeValue`. It is a boolean parameter, and if it is true, the entry event contains the entry value. In this example, it will be true.
 
