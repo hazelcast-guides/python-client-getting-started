@@ -112,9 +112,10 @@ some_map = client.get_map("some-map").blocking()
 
 If `some-map` doesn't exist, it will be automatically created. All the clients connected to the same cluster will have access to the same map.
 
-You may wonder why we have used `blocking()` method over the `get_map()`. This returns a version of this proxy with only blocking (sync) method calls, which is better for getting started. For async calls, please check our https://hazelcast.readthedocs.io/en/stable/client.html#hazelcast.client.HazelcastClient[API documentation].
+You may wonder why we have used `blocking()` method over the `get_map()`. This returns a version of this proxy with only blocking
+(sync) method calls, which is better for getting started. For async calls, please check our https://hazelcast.readthedocs.io/en/stable/client.html#hazelcast.client.HazelcastClient[API documentation].
 
-With these lines, client adds data to our `some-map`. The first parameter is the key of the entry, the second one is the value as mentioned above.
+With these lines, client adds data to `some-map`. The first parameter is the key of the entry, the second one is the value as mentioned above.
 
 [source, python]
 ----
