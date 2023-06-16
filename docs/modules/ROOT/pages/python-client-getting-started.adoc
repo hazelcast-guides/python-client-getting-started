@@ -14,17 +14,13 @@
 
 * A text editor
 
-* Hazelcast Cluster. You can use any of them below. In this tutorial, local cluster will be used.
+* Hazelcast Cluster. You can use any of them below. In this tutorial, a local cluster will be used.
 
 ** Local Hazelcast Cluster
 
 ** https://hazelcast.com/products/viridian/[Hazelcast Viridian] (Free account is available.)
 
-* Python 3.6+
-
-* Windows, Linux/UNIX or Mac OS X
-
-== Installing Hazelcast Cluster
+== Starting Hazelcast Cluster
 
 1. Go to https://hazelcast.com/open-source-projects/downloads/[Hazelcast Open Source Downloads] and download either the .zip or .tar distribution of Hazelcast.
 
@@ -34,7 +30,7 @@
 
 4. To start the cluster, use either hz-start or hz-start.bat depending on your operating system. Once you run the start script, you should see the Hazelcast logs in the terminal.
 
-== Installing and Starting with the Client
+== Installing and Starting the Client
 
 Create a new folder by
 
@@ -95,15 +91,12 @@ for key, value in entries:
 client.shutdown()
 ----
 
-
 The output snippet is
 [source, bash]
 ----
 12346 -> example2@email.com
 12345 -> example1@email.com
 ----
-
-Since Hazelcast clients work asynchronous, the output is not in order.
 
 Following line returns a map proxy object for the map with name `some-map`.
 
@@ -113,7 +106,7 @@ some_map = client.get_map("some-map").blocking()
 If `some-map` doesn't exist, it will be automatically created. All the clients connected to the same cluster will have access to the same map.
 
 You may wonder why we have used `blocking()` method over the `get_map()`. This returns a version of this proxy with only blocking
-(sync) method calls, which is better for getting started. For async calls, please check our https://hazelcast.readthedocs.io/en/stable/client.html#hazelcast.client.HazelcastClient[API documentation].
+(sync) method calls, which is better for getting started. For async calls, please check our https://hazelcast.readthedocs.io/en/stable/#usage[API documentation].
 
 With these lines, client adds data to `some-map`. The first parameter is the key of the entry, the second one is the value as mentioned above.
 
