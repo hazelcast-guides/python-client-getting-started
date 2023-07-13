@@ -1,4 +1,4 @@
-= Getting Started with the Python Client
+= Getting Started with the Hazelcast Python Client
 :page-layout: tutorial
 :page-product: imdg
 :page-categories: Caching, Getting Started
@@ -6,52 +6,40 @@
 :page-est-time: 5-10 mins
 :description: This tutorial will get you started with the Hazelcast Python client.
 
-== What You Will Learn
+== What You'll Learn
 
 {description}
 
-== Before You Begin
+== Before you Begin
 
-* A text editor
+* A text editor or IDE
+* Docker
+* Python 3.6+
 
-* Hazelcast Cluster. You can use any of them below. In this tutorial, a local cluster will be used.
+== Start a Hazelcast Member
 
-** Local Hazelcast Cluster
+We will use the 5.3 version of Hazelcast for this tutorial.
 
-** https://hazelcast.com/products/viridian/[Hazelcast Viridian] (Free account is available.)
+In this tutorial, we will use https://hazelcast.com/products/viridian/[Hazelcast Viridian Cloud].
 
-== Starting Hazelcast Cluster
+1. Sign up for a Hazelcast Viridian Cloud account (Free accounts are available).
+2. Log in to your Hazelcast Viridian Cloud account and navigate to your https://viridian.hazelcast.com[cluster list].
+3. Create a new cluster or start an existing one.
 
-1. Go to https://hazelcast.com/open-source-projects/downloads/[Hazelcast Open Source Downloads] and download either the .zip or .tar distribution of Hazelcast.
 
-2. Decompress the contents into any directory that you want to run members from.
+== Install Hazelcast Python Client
 
-3. Change into the directory that you decompressed the Hazelcast content and then into the bin directory.
+1. Identify the Hazelcast Viridian Cloud https://viridian.hazelcast.com[cluster] you want to connect to and choose Connect Cluster.
+2. Use the quick connection guide to download the preconfigured Python sample client.
+3. Follow the instructions on the quick connection guide to start using your cluster.
 
-4. To start the cluster, use either hz-start or hz-start.bat depending on your operating system. Once you run the start script, you should see the Hazelcast logs in the terminal.
+To understand and use the client, review the https://hazelcast.readthedocs.io/en/stable/client.html#hazelcast.client.HazelcastClient[Python API documentation] to better understand what is possible.
 
-== Installing and Starting the Client
+== Starting the Python Client
 
-Create a new folder by
+The following section creates and starts a new Hazelcast client with default configuration.
 
-[source, bash]
-mkdir hazelcast-python-client-getting-started
-
-Navigate to that folder by
-
-[source, bash]
-cd hazelcast-python-client-getting-started
-
-Hazelcast Python Client can be installed by pip3. Run the following command.
-
-[source, bash]
-pip3 install hazelcast-python-client
-
-Create a file named tutorial.py
-
-Put the following code inside of tutorial.py.
-
-[source, python]
+[source,python]
 ----
 import hazelcast
 
@@ -59,31 +47,22 @@ client = hazelcast.HazelcastClient()
 
 client.shutdown()
 ----
-To run this Python script, use the following command in the terminal.
-
-[source, bash]
-python3 tutorial.py
-
-First line imports the Hazelcast Python client.
-
-Following line creates and starts a new Hazelcast Client. To configure the client, you can check https://hazelcast.readthedocs.io/en/stable/client.html#hazelcast.client.HazelcastClient[API documentation].
 
 == Use Map
 
-A Hazelcast map is a distributed key-value store, similar to Python Map structure. In the following example, we will work with map entries where the keys are session ids and the values are emails.
+A Hazelcast map is a distributed key-value store, similar to Python dictionary. You can store key-value pairs in a map.
+In the following example, we will work with map entries where the keys are ids and the values are defined as an object representing a city.
 
-[source, python]
+[source,python]
 ----
-import hazelcast
-
 client = hazelcast.HazelcastClient()
 
-some_map = client.get_map("some-map").blocking()
+cities_map = client.get_map('cities').blocking()
+cities_map.set(1, "London")
+cities_map.set(2, "New York")
+cities_map.set(3, "Tokyo")
 
-some_map.set("12345", "example1@email.com")
-some_map.set("12346", "example2@email.com")
-
-entries = some_map.entry_set()
+entries = cities_map.entry_set()
 
 for key, value in entries:
     print(f"{key} -> {value}")
@@ -91,42 +70,60 @@ for key, value in entries:
 client.shutdown()
 ----
 
-The output snippet is
-[source, bash]
+The output of this snippet is given below:
+
+[source,bash]
 ----
-12346 -> example2@email.com
-12345 -> example1@email.com
+2 -> New York
+1 -> London
+3 -> Tokyo
 ----
 
-Following line returns a map proxy object for the map with name `some-map`.
+Following line returns a map proxy object for the `cities` map:
 
 [source, python]
-some_map = client.get_map("some-map").blocking()
+----
+cities_map = client.get_map('cities').blocking()
+----
 
-If `some-map` doesn't exist, it will be automatically created. All the clients connected to the same cluster will have access to the same map.
+If `cities` doesn't exist, it will be automatically created. All the clients connected to the same cluster will have access to the same map.
 
 You may wonder why we have used `blocking()` method over the `get_map()`. This returns a version of this proxy with only blocking
 (sync) method calls, which is better for getting started. For async calls, please check our https://hazelcast.readthedocs.io/en/stable/#usage[API documentation].
 
-With these lines, client adds data to `some-map`. The first parameter is the key of the entry, the second one is the value as mentioned above.
+With these lines, client adds data to `cities` map. The first parameter is the key of the entry, the second one is the value as mentioned above.
 
 [source, python]
 ----
-some_map.set("12345", "example1@email.com")
-some_map.set("12346", "example2@email.com")
+cities_map.set(1, "London")
+cities_map.set(2, "New York")
+cities_map.set(3, "Tokyo")
 ----
 
-Then, we get the values with the `entry_set()` method.
+Then, we get the values with the `entry_set()` method and iterate over the set.
+
+[source, python]
+----
+entries = cities_map.entry_set()
+
+for key, value in entries:
+    print(f"{key} -> {value}")
+----
 
 Finally, `client.shutdown()` terminates our client and release its resources.
 
 == Add a Listener to the Map
 
-You can add an entry listener using the `add_entry_listener()` method of the map proxy object. This enables your code to listen to map events of that particular map.
+You can add an entry listener using the `add_entry_listener()` method available on the map proxy object.
+This will allow you to listen to certain events that happen in the map across the cluster.
 
-The first argument to `add_entry_listener()` method is `includeValue`. It is a boolean parameter, and if it is true, the entry event contains the entry value. In this example, it will be true.
+The first argument to the `add_entry_listener()` method is `includeValue`.
+This boolean parameter, if set to true, ensures the entry event contains the entry value.
 
-The second argument to `add_entry_listener()` method is an object that is used to define listeners. In this example, we registered listeners for the `added`, `removed` and `updated` events.
+The second argument to the `add_entry_listener()` method is an object that is used to define listeners.
+In this example, we register listeners for the `added`, `removed` and `updated` events.
+
+This enables your code to listen to map events of that particular map.
 
 [source, python]
 ----
@@ -143,53 +140,44 @@ def entry_removed(event):
 def entry_updated(event):
     print(f"Entry updated with key: {event.key}, old value: {event.old_value}, new value: {event.value}")
 
-
-client = hazelcast.HazelcastClient()
-
-some_map = client.get_map("some-map").blocking()
-
-some_map.clear()
-
-some_map.add_entry_listener(
-    True, added_func=entry_added, removed_func=entry_removed, updated_func=entry_updated
+cities_map = client.get_map('cities').blocking()
+cities_map.add_entry_listener(
+    include_value=True, added_func=entry_added, removed_func=entry_removed, updated_func=entry_updated
 )
 
-some_map.set("12345", "example1@email.com")
-some_map.set("12346", "example2@email.com")
+cities_map.clear()
+cities_map.set(1, "London")
+cities_map.set(2, "New York")
+cities_map.set(3, "Tokyo")
 
-email1 = some_map.get("12345")
-email2 = some_map.get("12346")
+cities_map.remove(1)
+cities_map.replace(2, "Paris")
 
-print(f"Email 1: {email1}")
-print(f"Email 2: {email2}")
+cities_map.(1)
 
-some_map.delete("12345")
-some_map.set("12346", "example1@email.com")
+entries = cities_map.entry_set()
 
-email1 = some_map.get("12345")
-email2 = some_map.get("12346")
-
-print(f"Email 1: {email1}")
-print(f"Email 2: {email2}")
+for key, value in entries:
+    print(f"{key} -> {value}")
 
 client.shutdown()
 ----
 
-First, the map is cleared to fire events even if there are some entries in the map. Then, two session entries are added, and they are logged. After that, we remove one of the entries and update the other one. Then, we log the session entries again.
+First, the map is cleared to fire events even if there are some entries in the map. Then, entries are added, and they are logged. After that, we remove one of the entries and update the other one. Then, we log the entries again.
 
 The output is as follows.
 
 [source, bash]
 ----
-Entry added with key: 12345, value: example1@email.com
-Entry added with key: 12346, value: example2@email.com
-Email 1: example1@email.com
-Email 2: example2@email.com
-Entry removed with key: 12345
-Entry updated with key: 12346, old value: example2@email.com, new value: example1@email.com
-Email 1: None
-Email 2: example1@email.com
+Entry added with key: 1, value: London
+Entry added with key: 2, value: New York
+Entry added with key: 3, value: Tokyo
+Entry removed with key: 1
+Entry updated with key: 2, old value: New York, new value: Paris
+2 -> Paris
+3 -> Tokyo
 ----
+
 The value of the first entry becomes `None` since it is removed.
 
 == Summary
@@ -198,6 +186,8 @@ In this tutorial, you learned how to get started with Hazelcast Python Client us
 
 == See Also
 
-There are a lot of things that you can do with Python Client. For more, such as how you can query a map with predicates and SQL, check out our https://github.com/hazelcast/hazelcast-python-client[Python Client repository].
+There are a lot of things that you can do with the Python Client. For more, such as how you can query a map with predicates and SQL,
+check out our https://github.com/hazelcast/hazelcast-python-client[Python Client repository] and our https://hazelcast.readthedocs.io/en/stable/client.html#hazelcast.client.HazelcastClient[Python API documentation] to better understand what is possible.
 
-If you have any questions, suggestions, or feedback please do not hesitate to reach out to us via https://slack.hazelcast.com/[Hazelcast Community Slack]. Also, please take a look at https://github.com/hazelcast/hazelcast-python-client/issues[the issue list] if you would like to contribute to the client.
+If you have any questions, suggestions, or feedback please do not hesitate to reach out to us via https://slack.hazelcast.com/[Hazelcast Community Slack].
+Also, please take a look at https://github.com/hazelcast/hazelcast-python-client/issues[the issue list] if you would like to contribute to the client.
