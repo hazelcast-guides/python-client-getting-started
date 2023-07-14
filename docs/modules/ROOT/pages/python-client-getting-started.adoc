@@ -144,7 +144,6 @@ Fetching cities via SQL...OK.
 |    6 | Türkiye              | Ankara               | 5309690         |
 |    1 | United Kingdom       | London               | 9540576         |
 |    7 | Brazil               | Sao Paulo            | 22429800        |
-|    8 | Brazil               | Rio de Janeiro       | 13634274        |
 |    4 | United States        | Los Angeles          | 3985520         |
 |    5 | Türkiye              | Istanbul             | 15636243        |
 |    3 | United States        | New York             | 19223191        |
