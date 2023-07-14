@@ -155,8 +155,6 @@ cities_map.set(3, "Tokyo")
 cities_map.remove(1)
 cities_map.replace(2, "Paris")
 
-cities_map.(1)
-
 entries = cities_map.entry_set()
 
 for key, value in entries:
