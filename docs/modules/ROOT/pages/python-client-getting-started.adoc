@@ -137,7 +137,6 @@ The output of this code is given below:
 ----
 Creating the mapping...OK.
 Inserting data via SQL...OK.
-Putting a city into 'cities' map...OK.
 Fetching cities via SQL...OK.
 --Results of 'SELECT __key, this FROM cities'
 |   id | country              | city                 | population      |
