@@ -38,10 +38,14 @@ The following section creates and starts a Hazelcast client with default configu
 ----
 import hazelcast
 
+####################################
+
+# Connect to your Hazelcast Cluster
 client = hazelcast.HazelcastClient()
 
 # take actions
 
+# Shutdown the client connection
 client.shutdown()
 ----
 
