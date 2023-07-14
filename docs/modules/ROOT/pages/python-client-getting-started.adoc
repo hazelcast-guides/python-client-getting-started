@@ -58,6 +58,34 @@ In the following example, we will create a map and insert into it, entries where
 [source,python]
 ----
 import hazelcast
+from hazelcast import HazelcastClient
+from hazelcast.serialization.api import CompactReader, CompactSerializer, CompactWriter
+
+import typing
+
+class City:
+    def __init__(self, country: str, city: str, population: int) -> None:
+        self.country = country
+        self.city = city
+        self.population = population
+
+class CitySerializer(CompactSerializer[City]):
+    def read(self, reader: CompactReader) -> City:
+        city = reader.read_string("city")
+        country = reader.read_string("country")
+        population = reader.read_int32("population")
+        return City(country, city, population)
+
+    def write(self, writer: CompactWriter, obj: City) -> None:
+        writer.write_string("country", obj.country)
+        writer.write_string("city", obj.city)
+        writer.write_int32("population", obj.population)
+
+    def get_type_name(self) -> str:
+        return "city"
+
+    def get_class(self) -> typing.Type[City]:
+        return City
 
 def create_mapping(client: HazelcastClient) -> None:
     print("Creating the mapping...", end="")
@@ -116,7 +144,7 @@ def fetch_cities_via_sql(client: HazelcastClient) -> None:
 ####################################
 
 # Connect to your Hazelcast Cluster
-client = hazelcast.HazelcastClient()
+client = hazelcast.HazelcastClient(compact_serializers=[CitySerializer()])
 
 # Create a map on the cluster
 create_mapping(client)
@@ -160,6 +188,7 @@ In the following example, we will work with map entries where the keys are ids a
 [source,python]
 ----
 import hazelcast
+from hazelcast import HazelcastClient
 
 ####################################
 
