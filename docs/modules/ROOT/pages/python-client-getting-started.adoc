@@ -45,16 +45,123 @@ client = hazelcast.HazelcastClient()
 client.shutdown()
 ----
 
-== Understanding the Hazelcast Map
+== Understanding the Hazelcast SQL API
 
-A Hazelcast Map is a distributed key-value store, similar to Python dictionary. You can store key-value pairs in a Hazelcast Map.
+A Hazelcast SQL is a Calcite and ANSI SQL based interface to allow you to interact with Hazelcast much like any other datastore.
 
-In the following example, we will work with map entries where the keys are ids and the values are defined as an object representing a city.
+In the following example, we will create a map and insert into it, entries where the keys are ids and the values are defined as an object representing a city.
 
 [source,python]
 ----
 import hazelcast
 
+def create_mapping(client: HazelcastClient) -> None:
+    print("Creating the mapping...", end="")
+    # See: https://docs.hazelcast.com/hazelcast/latest/sql/mapping-to-maps
+    mapping_query = """
+        CREATE OR REPLACE MAPPING
+            cities (
+                __key INT,
+                country VARCHAR,
+                city VARCHAR,
+                population INT) TYPE IMAP
+            OPTIONS (
+                'keyFormat' = 'int',
+                'valueFormat' = 'compact',
+                'valueCompactTypeName' = 'city')
+    """
+    client.sql.execute(mapping_query).result()
+    print("OK.")
+
+def populate_cities(client: HazelcastClient) -> None:
+    print("Inserting data via SQL...", end="")
+
+    insert_query = """
+        INSERT INTO cities
+        (__key, city, country, population) VALUES
+        (1, 'London', 'United Kingdom', 9540576),
+        (2, 'Manchester', 'United Kingdom', 2770434),
+        (3, 'New York', 'United States', 19223191),
+        (4, 'Los Angeles', 'United States', 3985520),
+        (5, 'Istanbul', 'Türkiye', 15636243),
+        (6, 'Ankara', 'Türkiye', 5309690),
+        (7, 'Sao Paulo ', 'Brazil', 22429800)
+    """
+
+    try:
+        client.get_map('cities').clear()
+        client.sql.execute(insert_query).result()
+        print("OK.")
+    except Exception as e:
+        print(f"FAILED: {e!s}.")
+
+def fetch_cities_via_sql(client: HazelcastClient) -> None:
+    print("Fetching cities via SQL...", end="")
+    result = client.sql.execute("SELECT __key, this FROM cities").result()
+    print("OK.")
+
+    print("--Results of 'SELECT __key, this FROM cities'")
+    print(f"| {'id':>4} | {'country':<20} | {'city':<20} | {'population':<15} |")
+
+    for row in result:
+        city = row["this"]
+        print(
+            f"| {row['__key']:>4} | {city.country:<20} | {city.city:<20} | {city.population:<15} |"
+        )
+
+####################################
+
+# Connect to your Hazelcast Cluster
+client = hazelcast.HazelcastClient()
+
+# Create a map on the cluster
+create_mapping(client)
+
+# Add some data
+populate_cities(client)
+
+# Output the data
+fetch_cities_via_sql(client)
+
+# Shutdown the client connection
+client.shutdown()
+----
+
+The output of this code is given below:
+
+[source,bash]
+----
+Creating the mapping...OK.
+Inserting data via SQL...OK.
+Putting a city into 'cities' map...OK.
+Fetching cities via SQL...OK.
+--Results of 'SELECT __key, this FROM cities'
+|   id | country              | city                 | population      |
+|    2 | United Kingdom       | Manchester           | 2770434         |
+|    6 | Türkiye              | Ankara               | 5309690         |
+|    1 | United Kingdom       | London               | 9540576         |
+|    7 | Brazil               | Sao Paulo            | 22429800        |
+|    8 | Brazil               | Rio de Janeiro       | 13634274        |
+|    4 | United States        | Los Angeles          | 3985520         |
+|    5 | Türkiye              | Istanbul             | 15636243        |
+|    3 | United States        | New York             | 19223191        |
+----
+
+NOTE: Ordering of the keys is NOT enforced and results may NOT correspond to insertion order.
+
+== Understanding the Hazelcast Map API
+
+A Hazelcast Map is a distributed key-value store, similar to Python dictionary. You can store key-value pairs in a Hazelcast Map.
+
+In the following example, we will work with map entries where the keys are ids and the values are defined as a string representing a city name.
+
+[source,python]
+----
+import hazelcast
+
+####################################
+
+# Connect to your Hazelcast Cluster
 client = hazelcast.HazelcastClient()
 
 # Create a map on the cluster
@@ -71,6 +178,7 @@ entries = cities_map.entry_set()
 for key, value in entries:
     print(f"{key} -> {value}")
 
+# Shutdown the client connection
 client.shutdown()
 ----
 
@@ -138,21 +246,26 @@ import hazelcast
 def entry_added(event):
     print(f"Entry added with key: {event.key}, value: {event.value}")
 
-
 def entry_removed(event):
     print(f"Entry removed with key: {event.key}")
-
 
 def entry_updated(event):
     print(f"Entry updated with key: {event.key}, old value: {event.old_value}, new value: {event.value}")
 
+####################################
+
+# Connect to your Hazelcast Cluster
 client = hazelcast.HazelcastClient()
 
+# Create a map on the cluster
 cities_map = client.get_map('cities').blocking()
+
+# Add listeners
 cities_map.add_entry_listener(
     include_value=True, added_func=entry_added, removed_func=entry_removed, updated_func=entry_updated
 )
 
+# Add some data
 cities_map.clear()
 cities_map.set(1, "London")
 cities_map.set(2, "New York")
@@ -161,11 +274,13 @@ cities_map.set(3, "Tokyo")
 cities_map.remove(1)
 cities_map.replace(2, "Paris")
 
+# Output the data
 entries = cities_map.entry_set()
 
 for key, value in entries:
     print(f"{key} -> {value}")
 
+# Shutdown the client connection
 client.shutdown()
 ----
 
