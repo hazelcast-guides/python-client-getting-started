@@ -144,8 +144,6 @@ def fetch_cities_via_sql(client: HazelcastClient) -> None:
 ####################################
 
 # Connect to your Hazelcast Cluster
-client = hazelcast.HazelcastClient(compact_serializers=[CitySerializer()])
-
 client = hazelcast.HazelcastClient(
     # Viridian Cluster Name and Token
     cluster_name="<CLUSTER_NAME>",
