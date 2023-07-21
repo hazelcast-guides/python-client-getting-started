@@ -146,6 +146,22 @@ def fetch_cities_via_sql(client: HazelcastClient) -> None:
 # Connect to your Hazelcast Cluster
 client = hazelcast.HazelcastClient(compact_serializers=[CitySerializer()])
 
+client = hazelcast.HazelcastClient(
+    # Viridian Cluster Name and Token
+    cluster_name="<CLUSTER_NAME>",
+    cloud_discovery_token="<YOUR_DISCOVERY_TOKEN>",
+
+    # configure SSL
+    ssl_enabled=True,
+    ssl_cafile=os.path.abspath("ca.pem"),
+    ssl_certfile=os.path.abspath("cert.pem"),
+    ssl_keyfile=os.path.abspath("key.pem"),
+    ssl_password="<CERTIFICATE_PASSWORD>",
+
+    # Register Compact serializer of City class
+    compact_serializers=[CitySerializer()],
+)
+
 # Create a map on the cluster
 create_mapping(client)
 
@@ -193,7 +209,18 @@ from hazelcast import HazelcastClient
 ####################################
 
 # Connect to your Hazelcast Cluster
-client = hazelcast.HazelcastClient()
+client = hazelcast.HazelcastClient(
+    # Viridian Cluster Name and Token
+    cluster_name="<CLUSTER_NAME>",
+    cloud_discovery_token="<YOUR_DISCOVERY_TOKEN>",
+
+    # configure SSL
+    ssl_enabled=True,
+    ssl_cafile=os.path.abspath("ca.pem"),
+    ssl_certfile=os.path.abspath("cert.pem"),
+    ssl_keyfile=os.path.abspath("key.pem"),
+    ssl_password="<CERTIFICATE_PASSWORD>",
+)
 
 # Create a map on the cluster
 cities_map = client.get_map('cities').blocking()
@@ -286,7 +313,18 @@ def entry_updated(event):
 ####################################
 
 # Connect to your Hazelcast Cluster
-client = hazelcast.HazelcastClient()
+client = hazelcast.HazelcastClient(
+    # Viridian Cluster Name and Token
+    cluster_name="<CLUSTER_NAME>",
+    cloud_discovery_token="<YOUR_DISCOVERY_TOKEN>",
+
+    # configure SSL
+    ssl_enabled=True,
+    ssl_cafile=os.path.abspath("ca.pem"),
+    ssl_certfile=os.path.abspath("cert.pem"),
+    ssl_keyfile=os.path.abspath("key.pem"),
+    ssl_password="<CERTIFICATE_PASSWORD>",
+)
 
 # Create a map on the cluster
 cities_map = client.get_map('cities').blocking()
