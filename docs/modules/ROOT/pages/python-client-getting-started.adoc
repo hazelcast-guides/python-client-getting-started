@@ -106,7 +106,7 @@ def create_mapping(client: HazelcastClient) -> None:
     print("OK.")
 
 def populate_cities(client: HazelcastClient) -> None:
-    print("Inserting data via SQL...", end="")
+    print("Inserting data...", end="")
 
     insert_query = """
         INSERT INTO cities
@@ -121,14 +121,14 @@ def populate_cities(client: HazelcastClient) -> None:
     """
 
     try:
-        client.get_map('cities').clear()
+        client.sql.execute('DELETE from cities').result()
         client.sql.execute(insert_query).result()
         print("OK.")
     except Exception as e:
         print(f"FAILED: {e!s}.")
 
-def fetch_cities_via_sql(client: HazelcastClient) -> None:
-    print("Fetching cities via SQL...", end="")
+def fetch_cities(client: HazelcastClient) -> None:
+    print("Fetching cities...", end="")
     result = client.sql.execute("SELECT __key, this FROM cities").result()
     print("OK.")
 
@@ -167,7 +167,7 @@ create_mapping(client)
 populate_cities(client)
 
 # Output the data
-fetch_cities_via_sql(client)
+fetch_cities(client)
 
 # Shutdown the client connection
 client.shutdown()
@@ -178,8 +178,8 @@ The output of this code is given below:
 [source,bash]
 ----
 Creating the mapping...OK.
-Inserting data via SQL...OK.
-Fetching cities via SQL...OK.
+Inserting data...OK.
+Fetching cities...OK.
 --Results of 'SELECT __key, this FROM cities'
 |   id | country              | city                 | population      |
 |    2 | United Kingdom       | Manchester           | 2770434         |
@@ -222,6 +222,9 @@ client = hazelcast.HazelcastClient(
 
 # Create a map on the cluster
 cities_map = client.get_map('cities').blocking()
+
+# Clear the map
+cities_map.clear()
 
 # Add some data
 cities_map.put(1, "London")
@@ -332,8 +335,10 @@ cities_map.add_entry_listener(
     include_value=True, added_func=entry_added, removed_func=entry_removed, updated_func=entry_updated
 )
 
-# Add some data
+# Clear the map
 cities_map.clear()
+
+# Add some data
 cities_map.set(1, "London")
 cities_map.set(2, "New York")
 cities_map.set(3, "Tokyo")
