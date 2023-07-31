@@ -1,7 +1,7 @@
 = Getting Started with the Hazelcast Python Client
 :page-layout: tutorial
 :page-product: platform
-:page-categories: Caching, Getting Started
+:page-categories: Get Started
 :page-lang: python3
 :page-est-time: 5-10 mins
 :description: This tutorial will get you started with the Hazelcast Python client and manipulate a map.
@@ -34,6 +34,13 @@ mkdir hazelcast-python-example
 cd hazelcast-python-example
 ----
 
+Download the Hazelcast Python Client library using pip:
+
+[source]
+----
+python -m pip install hazelcast-python-client
+----
+
 Extract the keystore files you downloaded from Viridian into this directory. The files you need for this tutorial are:
 
 [source,bash]
@@ -52,6 +59,7 @@ Create a Python file named “example.py” and put the following code inside it
 [source,python]
 ----
 import hazelcast
+import os
 
 ####################################
 
@@ -89,7 +97,7 @@ In the following example, we will create a map and insert into it, entries where
 import hazelcast
 from hazelcast import HazelcastClient
 from hazelcast.serialization.api import CompactReader, CompactSerializer, CompactWriter
-
+import os
 import typing
 
 class City:
@@ -231,7 +239,7 @@ In the following example, we will work with map entries where the keys are ids a
 [source,python]
 ----
 import hazelcast
-from hazelcast import HazelcastClient
+import os
 
 ####################################
 
@@ -330,6 +338,7 @@ This enables your code to listen to map events of that particular map.
 [source, python]
 ----
 import hazelcast
+import os
 
 def entry_added(event):
     print(f"Entry added with key: {event.key}, value: {event.value}")
