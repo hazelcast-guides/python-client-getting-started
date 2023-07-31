@@ -45,7 +45,9 @@ key.pem
 
 == Understanding the Python Client
 
-The following section creates and starts a Hazelcast client with default configuration, before shutting it down at the end.
+The following section creates and starts a Hazelcast client with default configuration, connects to your Viridian cluster before shutting the client down at the end.
+
+Create a Python file named “example.py” and put the following code inside it:
 
 [source,python]
 ----
@@ -236,7 +238,7 @@ from hazelcast import HazelcastClient
 # Connect to your Hazelcast Cluster
 client = hazelcast.HazelcastClient(
     # Viridian Cluster Name and Token
-    cluster_name="<CLUSTER_NAME>",
+    cluster_name="<YOUR_CLUSTER_ID>",
     cloud_discovery_token="<YOUR_DISCOVERY_TOKEN>",
 
     # configure SSL
@@ -244,7 +246,7 @@ client = hazelcast.HazelcastClient(
     ssl_cafile=os.path.abspath("ca.pem"),
     ssl_certfile=os.path.abspath("cert.pem"),
     ssl_keyfile=os.path.abspath("key.pem"),
-    ssl_password="<CERTIFICATE_PASSWORD>",
+    ssl_password="<YOUR_CERTIFICATE_PASSWORD>",
 )
 
 # Create a map on the cluster
@@ -343,7 +345,7 @@ def entry_updated(event):
 # Connect to your Hazelcast Cluster
 client = hazelcast.HazelcastClient(
     # Viridian Cluster Name and Token
-    cluster_name="<CLUSTER_NAME>",
+    cluster_name="<YOUR_CLUSTER_ID>",
     cloud_discovery_token="<YOUR_DISCOVERY_TOKEN>",
 
     # configure SSL
@@ -351,7 +353,7 @@ client = hazelcast.HazelcastClient(
     ssl_cafile=os.path.abspath("ca.pem"),
     ssl_certfile=os.path.abspath("cert.pem"),
     ssl_keyfile=os.path.abspath("key.pem"),
-    ssl_password="<CERTIFICATE_PASSWORD>",
+    ssl_password="<YOUR_CERTIFICATE_PASSWORD>",
 )
 
 # Create a map on the cluster
